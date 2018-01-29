@@ -24,8 +24,8 @@ fn parse_key(index: &mut usize, chars: &mut Peekable<CharIndices>) -> Result<Str
         })
         .collect();
 
-    let next = chars.peek();
     if key.len() == 0 {
+        let next = chars.peek();
         if let Some(&(i, c)) = next {
             *index = i;
             return match c {
