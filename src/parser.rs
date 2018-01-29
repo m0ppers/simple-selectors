@@ -11,11 +11,7 @@ fn parse_key(index: &mut usize, chars: &mut Peekable<CharIndices>) -> Result<Str
     // find the first non matching char
     let key: String = chars
         .take_while_ref(|&(_i, c)| match c {
-            'a'...'z' => true,
-            'A'...'Z' => true,
-            '0'...'9' => true,
-            '-' => true,
-            '_' => true,
+            'a'...'z' | 'A'...'Z' | '0'...'9' | '-' | '_' => true,
             _ => false,
         })
         .map(|(i, c)| {
@@ -24,7 +20,7 @@ fn parse_key(index: &mut usize, chars: &mut Peekable<CharIndices>) -> Result<Str
         })
         .collect();
 
-    if key.len() == 0 {
+    if key.is_empty() {
         let next = chars.peek();
         if let Some(&(i, c)) = next {
             *index = i;
@@ -120,11 +116,7 @@ fn parse_operator(
 fn parse_value(index: &mut usize, chars: &mut Peekable<CharIndices>) -> Result<String, ParseError> {
     let value: String = chars
         .take_while_ref(|&(_i, c)| match c {
-            '!' => false,
-            '=' => false,
-            ',' => false,
-            '(' => false,
-            ')' => false,
+            '!' | '=' | ',' | '(' | ')' => false,
             _ => !c.is_whitespace(),
         })
         .map(|(i, c)| {
@@ -133,7 +125,7 @@ fn parse_value(index: &mut usize, chars: &mut Peekable<CharIndices>) -> Result<S
         })
         .collect();
 
-    if value.len() == 0 {
+    if value.is_empty() {
         Err(ParseError::ExpectingValue(*index))
     } else {
         Ok(value)
@@ -184,14 +176,14 @@ fn parse_set(
     Ok(result)
 }
 
-fn compare_value(label: Option<&&str>, value: String) -> bool {
+fn compare_value(label: Option<&&str>, value: &str) -> bool {
     match label {
         None => false,
         Some(label) => *label == value,
     }
 }
 
-fn compare_set(label: Option<&&str>, value: Vec<String>) -> bool {
+fn compare_set(label: Option<&&str>, value: &[String]) -> bool {
     match label {
         None => false,
         Some(label) => value.contains(&String::from(*label)),
@@ -207,10 +199,10 @@ fn parse_operation(
     skip_whitespaces(index, chars);
 
     Ok(match operator {
-        Operator::Equality => compare_value(label, parse_value(index, chars)?),
-        Operator::InEquality => !compare_value(label, parse_value(index, chars)?),
-        Operator::InSet => compare_set(label, parse_set(index, chars)?),
-        Operator::NotInSet => !compare_set(label, parse_set(index, chars)?),
+        Operator::Equality => compare_value(label, &parse_value(index, chars)?),
+        Operator::InEquality => !compare_value(label, &parse_value(index, chars)?),
+        Operator::InSet => compare_set(label, &parse_set(index, chars)?),
+        Operator::NotInSet => !compare_set(label, &parse_set(index, chars)?),
     })
 }
 
@@ -246,9 +238,10 @@ fn parse_requirement(
             }
         }
     };
-    let value = match simple_exists_check {
-        true => labels.contains_key(key.as_str()),
-        false => parse_operation(index, labels.get(key.as_str()), chars)?,
+    let value = if simple_exists_check {
+        labels.contains_key(key.as_str())
+    } else {
+        parse_operation(index, labels.get(key.as_str()), chars)?
     };
 
     Ok(if positive { value } else { !value })
@@ -276,7 +269,7 @@ fn parse_selector(selector: &str, labels: &LabelMap) -> Result<bool, ParseError>
 }
 
 pub fn parse(selector: &str, labelmap: &LabelMap) -> Result<bool, ParseError> {
-    if selector.len() == 0 {
+    if selector.is_empty() {
         return Err(ParseError::EmptySelector);
     }
     parse_selector(selector, labelmap)
