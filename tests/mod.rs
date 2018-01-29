@@ -30,7 +30,7 @@ fn it_will_return_true_for_known_labels() {
 #[test]
 fn it_will_ignore_whitespaces_in_the_beginning() {
     let selector = " hmpf";
-    
+
     let labels = LabelMap::new();
     let result = parse(selector, &labels);
 

@@ -1,7 +1,7 @@
 use itertools::Itertools;
 use std::collections::HashMap;
 use std::str::CharIndices;
-use std::iter::{Peekable};
+use std::iter::Peekable;
 
 use super::ParseError;
 
@@ -23,7 +23,7 @@ fn parse_key(index: &mut usize, chars: &mut Peekable<CharIndices>) -> Result<Str
             c
         })
         .collect();
-    
+
     let next = chars.peek();
     if key.len() == 0 {
         if let Some(&(i, c)) = next {
@@ -31,7 +31,7 @@ fn parse_key(index: &mut usize, chars: &mut Peekable<CharIndices>) -> Result<Str
             return match c {
                 ',' => Ok(key),
                 _ => Err(ParseError::InvalidKey(i)),
-            }
+            };
         } else {
             // XXX no line number...also unexpected as caller needs to ensure
             // there is at least something here
@@ -61,45 +61,49 @@ enum Operator {
     NotInSet,
 }
 
-fn parse_operator(index: &mut usize, chars: &mut Peekable<CharIndices>) -> Result<Operator, ParseError> {
+fn parse_operator(
+    index: &mut usize,
+    chars: &mut Peekable<CharIndices>,
+) -> Result<Operator, ParseError> {
     match chars.next() {
         Some((i, c)) => {
             *index = i;
             match c {
                 '=' => {
-                    if let Some(&(i,c)) = chars.peek() {
+                    if let Some(&(i, c)) = chars.peek() {
                         if c == '=' {
                             chars.next();
                             *index = i;
                         }
                     }
                     Ok(Operator::Equality)
-                },
-                '!' => match chars.next() {
+                }
+                '!' => {
+                    match chars.next() {
                         Some((i, c)) => {
                             *index = i;
                             match c {
                                 '=' => Ok(Operator::InEquality),
                                 _ => Err(ParseError::InvalidOperator(i)),
                             }
-                        },
+                        }
                         None => Err(ParseError::InvalidOperator(i)),
-                    },
-                'i' => match chars.next() {
+                    }
+                }
+                'i' => {
+                    match chars.next() {
                         Some((i, c)) => {
                             *index = i;
                             match c {
                                 'n' => Ok(Operator::InSet),
                                 _ => Err(ParseError::InvalidOperator(i)),
                             }
-                        },
+                        }
                         None => Err(ParseError::InvalidOperator(i)),
-                },
+                    }
+                }
                 'n' => {
-                    let s:String = chars
-                        .take(4)
-                        .map(|(_i, c)| c)
-                        .collect();
+                    let s: String = chars.take(4).map(|(_i, c)| c).collect();
 
                     if s == "otin" {
                         *index += 5;
@@ -107,16 +111,16 @@ fn parse_operator(index: &mut usize, chars: &mut Peekable<CharIndices>) -> Resul
                     } else {
                         Err(ParseError::InvalidOperator(i))
                     }
-                },
+                }
                 _ => Err(ParseError::InvalidOperator(i)),
             }
-        },
+        }
         None => Err(ParseError::InvalidOperator(*index)),
     }
 }
 
 fn parse_value(index: &mut usize, chars: &mut Peekable<CharIndices>) -> Result<String, ParseError> {
-    let value:String = chars
+    let value: String = chars
         .take_while_ref(|&(_i, c)| match c {
             '!' => false,
             '=' => false,
@@ -138,7 +142,10 @@ fn parse_value(index: &mut usize, chars: &mut Peekable<CharIndices>) -> Result<S
     }
 }
 
-fn parse_set(index: &mut usize, chars: &mut Peekable<CharIndices>) -> Result<Vec<String>, ParseError> {
+fn parse_set(
+    index: &mut usize,
+    chars: &mut Peekable<CharIndices>,
+) -> Result<Vec<String>, ParseError> {
     let mut result = vec![];
 
     let parens = chars.next();
@@ -158,15 +165,13 @@ fn parse_set(index: &mut usize, chars: &mut Peekable<CharIndices>) -> Result<Vec
         skip_whitespaces(index, chars);
         if !first {
             match chars.next() {
-                None => {
-                    return Err(ParseError::ExpectingEndOrComma(*index))
-                },
+                None => return Err(ParseError::ExpectingEndOrComma(*index)),
                 Some((i, c)) => {
                     *index = i;
                     match c {
                         ')' => {
                             break;
-                        },
+                        }
                         ',' => (),
                         _ => {
                             return Err(ParseError::ExpectingEndOrComma(i));
@@ -191,16 +196,18 @@ fn compare_value(label: Option<&&str>, value: String) -> bool {
 fn compare_set(label: Option<&&str>, value: Vec<String>) -> bool {
     match label {
         None => false,
-        Some(label) => {
-            value.contains(&String::from(*label))
-        },
+        Some(label) => value.contains(&String::from(*label)),
     }
 }
 
-fn parse_operation(index: &mut usize, label: Option<&&str>, chars: &mut Peekable<CharIndices>) -> Result<bool, ParseError> {
+fn parse_operation(
+    index: &mut usize,
+    label: Option<&&str>,
+    chars: &mut Peekable<CharIndices>,
+) -> Result<bool, ParseError> {
     let operator = parse_operator(index, chars)?;
     skip_whitespaces(index, chars);
-    
+
     Ok(match operator {
         Operator::Equality => compare_value(label, parse_value(index, chars)?),
         Operator::InEquality => !compare_value(label, parse_value(index, chars)?),
@@ -209,9 +216,13 @@ fn parse_operation(index: &mut usize, label: Option<&&str>, chars: &mut Peekable
     })
 }
 
-fn parse_requirement(index: &mut usize, chars: &mut Peekable<CharIndices>, labels: &LabelMap) -> Result<bool, ParseError> {
+fn parse_requirement(
+    index: &mut usize,
+    chars: &mut Peekable<CharIndices>,
+    labels: &LabelMap,
+) -> Result<bool, ParseError> {
     skip_whitespaces(index, chars);
-    
+
     let mut positive = true;
     if let Some(&(i, c)) = chars.peek() {
         if c == '!' {
@@ -234,7 +245,7 @@ fn parse_requirement(index: &mut usize, chars: &mut Peekable<CharIndices>, label
                     ',' => true,
                     _ => false,
                 }
-            },
+            }
         }
     };
     let value = match simple_exists_check {
@@ -242,18 +253,12 @@ fn parse_requirement(index: &mut usize, chars: &mut Peekable<CharIndices>, label
         false => parse_operation(index, labels.get(key.as_str()), chars)?,
     };
 
-    Ok(if positive {
-        value
-    } else {
-        !value
-    })
+    Ok(if positive { value } else { !value })
 }
 
 fn parse_selector(selector: &str, labels: &LabelMap) -> Result<bool, ParseError> {
-    let mut chars = selector
-        .char_indices()
-        .peekable();
-    
+    let mut chars = selector.char_indices().peekable();
+
     let mut index = 0;
     let mut result = parse_requirement(&mut index, &mut chars, labels)?;
     loop {
@@ -284,18 +289,18 @@ mod tests {
     #[test]
     fn it_should_properly_parse_a_full_key() {
         let selector = "test";
-        
+
         let mut index = 0;
         let mut char_indices = selector.char_indices().peekable();
         let result = super::parse_key(&mut index, &mut char_indices);
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), "test");
     }
-    
+
     #[test]
     fn it_will_parse_keys_until_invalid_chars() {
         let selector = "test/";
-        
+
         let mut index = 0;
         let mut char_indices = selector.char_indices().peekable();
         let result = super::parse_key(&mut index, &mut char_indices);
@@ -309,7 +314,7 @@ mod tests {
     #[test]
     fn it_will_accept_valid_keys_but_stop_consuming() {
         let selector = "test /";
-        
+
         let mut index = 0;
         let mut char_indices = selector.char_indices().peekable();
         let key = super::parse_key(&mut index, &mut char_indices);
