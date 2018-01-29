@@ -33,8 +33,6 @@ fn parse_key(index: &mut usize, chars: &mut Peekable<CharIndices>) -> Result<Str
                 _ => Err(ParseError::InvalidKey(i)),
             };
         } else {
-            // XXX no line number...also unexpected as caller needs to ensure
-            // there is at least something here
             return Err(ParseError::InvalidKey(*index));
         }
     }
