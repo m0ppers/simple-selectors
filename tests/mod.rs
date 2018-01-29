@@ -119,3 +119,30 @@ fn it_will_check_not_sets() {
     assert!(result.is_ok());
     assert!(!result.unwrap());
 }
+
+#[test]
+fn it_will_parse_multiple_conditions() {
+    let mut labels = LabelMap::new();
+    labels.insert("test", "test");
+    let result = parse("test notin (test1), test = test", &labels);
+    assert!(result.is_ok());
+    assert!(result.unwrap());
+}
+
+#[test]
+fn it_will_fail_if_first_condition_is_false() {
+    let mut labels = LabelMap::new();
+    labels.insert("test", "test");
+    let result = parse("test notin (test), test = test", &labels);
+    assert!(result.is_ok());
+    assert!(!result.unwrap());
+}
+
+#[test]
+fn it_will_fail_if_second_condition_is_false() {
+    let mut labels = LabelMap::new();
+    labels.insert("test", "test");
+    let result = parse("test notin (test1), test = test1", &labels);
+    assert!(result.is_ok());
+    assert!(!result.unwrap());
+}
