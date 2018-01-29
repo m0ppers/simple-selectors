@@ -1,0 +1,10 @@
+[package]
+name = "simple-selectors"
+version = "0.1.0"
+authors = ["Andreas Streichardt <andreas@mop.koeln>"]
+
+[dependencies]
+itertools = "0.7.6"
+
+[dev-dependencies]
+assert_matches = "1.1"
