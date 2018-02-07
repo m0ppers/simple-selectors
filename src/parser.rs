@@ -5,6 +5,7 @@ use std::iter::Peekable;
 
 use super::ParseError;
 
+/// String map type to pass to the parse function
 pub type LabelMap<'a> = HashMap<&'a str, &'a str>;
 
 fn parse_key(index: &mut usize, chars: &mut Peekable<CharIndices>) -> Result<String, ParseError> {
@@ -72,30 +73,26 @@ fn parse_operator(
                     }
                     Ok(Operator::Equality)
                 }
-                '!' => {
-                    match chars.next() {
-                        Some((i, c)) => {
-                            *index = i;
-                            match c {
-                                '=' => Ok(Operator::InEquality),
-                                _ => Err(ParseError::InvalidOperator(i)),
-                            }
+                '!' => match chars.next() {
+                    Some((i, c)) => {
+                        *index = i;
+                        match c {
+                            '=' => Ok(Operator::InEquality),
+                            _ => Err(ParseError::InvalidOperator(i)),
                         }
-                        None => Err(ParseError::InvalidOperator(i)),
                     }
-                }
-                'i' => {
-                    match chars.next() {
-                        Some((i, c)) => {
-                            *index = i;
-                            match c {
-                                'n' => Ok(Operator::InSet),
-                                _ => Err(ParseError::InvalidOperator(i)),
-                            }
+                    None => Err(ParseError::InvalidOperator(i)),
+                },
+                'i' => match chars.next() {
+                    Some((i, c)) => {
+                        *index = i;
+                        match c {
+                            'n' => Ok(Operator::InSet),
+                            _ => Err(ParseError::InvalidOperator(i)),
                         }
-                        None => Err(ParseError::InvalidOperator(i)),
                     }
-                }
+                    None => Err(ParseError::InvalidOperator(i)),
+                },
                 'n' => {
                     let s: String = chars.take(4).map(|(_i, c)| c).collect();
 
@@ -263,11 +260,13 @@ fn parse_selector(selector: &str, labels: &LabelMap) -> Result<bool, ParseError>
             break;
         }
         result = parse_requirement(&mut index, &mut chars, labels)? && result;
-
     }
     Ok(result)
 }
 
+/// this function will parse a selector and return its result.
+/// A (valid) selector will return a simple boolean indicating
+/// if the selector matched or not.
 pub fn parse(selector: &str, labelmap: &LabelMap) -> Result<bool, ParseError> {
     if selector.is_empty() {
         return Err(ParseError::EmptySelector);

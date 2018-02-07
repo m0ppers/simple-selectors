@@ -1,3 +1,7 @@
+//! Parser for k8s style selectors
+//!
+//! Simple label matching syntax as in `label = value`
+
 #[macro_use]
 #[cfg(test)]
 extern crate assert_matches;
