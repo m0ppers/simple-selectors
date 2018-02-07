@@ -1,6 +1,6 @@
 # simple-selectors
 
-[![Build Status](https://www.travis-ci.org/m0ppers/simple-selectors.svg?branch=master)](https://www.travis-ci.org/m0ppers/simple-selectors)
+[![Build Status](https://www.travis-ci.org/m0ppers/simple-selectors.svg?branch=master)](https://www.travis-ci.org/m0ppers/simple-selectors) [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
 
 k8s style selectors for rust.
 
