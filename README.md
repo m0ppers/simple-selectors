@@ -32,4 +32,4 @@ let result = parse("test = test, test1 in (test)", &labels);
 
 Both very welcome. This is my first public crate and I am just starting to learn rust. So non-idiomatic rust
 and beginner mistakes are to be expected in the code base. Please provide feedback and contributions so
-I can fix it :).
+I can fix it :)
