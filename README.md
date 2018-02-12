@@ -27,3 +27,9 @@ labels.insert("test", "test");
 labels.insert("test1", "test");
 let result = parse("test = test, test1 in (test)", &labels);
 ```
+
+## Feedback and Contributions
+
+Both very welcome. This is my first public crate and I am just starting to learn rust. So non-idiomatic rust
+and beginner mistakes are to be expected in the code base. Please provide feedback and contributions so
+I can fix it :).
