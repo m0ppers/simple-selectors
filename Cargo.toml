@@ -2,6 +2,12 @@
 name = "simple-selectors"
 version = "0.1.0"
 authors = ["Andreas Streichardt <andreas@mop.koeln>"]
+description = "A simple label selector syntax inspired (and mostly compatible) to k8s"
+readme = "README.md"
+homepage = "https://github.com/m0ppers/simple-selectors"
+repository = "https://github.com/m0ppers/simple-selectors"
+license = "Unlicense"
+keywords = ["k8s", "dsl", "expressions"]
 
 [dependencies]
 itertools = "0.7.6"
