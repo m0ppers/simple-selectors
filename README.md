@@ -1,6 +1,6 @@
 # simple-selectors
 
-[![Build Status](https://www.travis-ci.org/m0ppers/simple-selectors.svg?branch=master)](https://www.travis-ci.org/m0ppers/simple-selectors) [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/) [![Crates.io](https://img.shields.io/crates/v/simple-selectors.svg)](https://crates.io/crates/simple-selectors)
+[![Build Status](https://www.travis-ci.org/m0ppers/simple-selectors.svg?branch=master)](https://www.travis-ci.org/m0ppers/simple-selectors) [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/) [![Crates.io](https://img.shields.io/crates/v/simple-selectors.svg)](https://crates.io/crates/simple-selectors) [![Coverage Status](https://coveralls.io/repos/github/m0ppers/simple-selectors/badge.svg?branch=master)](https://coveralls.io/github/m0ppers/simple-selectors?branch=master)
 
 k8s style selectors for rust.
 
